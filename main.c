@@ -5,11 +5,8 @@
 #include <stdlib.h>
 
 #include "lvgl/lvgl.h"
-#include "lvgl/demos/lv_demos.h"
+#include "lvgl/src/display/lv_display.h"
 
-#if LV_USE_WAYLAND
-#include "backends/interface.h"
-#endif
 
 uint16_t window_width;
 uint16_t window_height;
@@ -41,10 +38,10 @@ static void lv_linux_init_input_pointer(lv_display_t *disp)
     lv_indev_set_display(touch, disp);
 
     /* Set the cursor icon */
-    LV_IMAGE_DECLARE(mouse_cursor_icon);
-    lv_obj_t * cursor_obj = lv_image_create(lv_screen_active());
-    lv_image_set_src(cursor_obj, &mouse_cursor_icon);
-    lv_indev_set_cursor(touch, cursor_obj);
+    // LV_IMAGE_DECLARE(mouse_cursor_icon);
+    // lv_obj_t * cursor_obj = lv_image_create(lv_screen_active());
+    // lv_image_set_src(cursor_obj, &mouse_cursor_icon);
+    // lv_indev_set_cursor(touch, cursor_obj);
 }
 #endif
 
@@ -72,17 +69,6 @@ static void lv_linux_disp_init(void)
 
     lv_linux_drm_set_file(disp, device, -1);
 }
-#elif LV_USE_SDL
-static void lv_linux_disp_init(void)
-{
-
-    lv_sdl_window_create(window_width, window_height);
-
-}
-#elif LV_USE_WAYLAND
-    /* see backend/wayland.c */
-#else
-#error Unsupported configuration
 #endif
 
 #if LV_USE_WAYLAND == 0
@@ -158,9 +144,8 @@ int main(int argc, char **argv)
     /* Initialize the configured backend SDL2, FBDEV, libDRM or wayland */
     lv_linux_disp_init();
 
-    /*Create a Demo*/
-    lv_demo_widgets();
-    lv_demo_widgets_start_slideshow();
+    lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
 
     lv_linux_run_loop();
 
