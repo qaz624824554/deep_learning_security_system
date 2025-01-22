@@ -1,3 +1,4 @@
+#include <src/libs/freetype/lv_freetype.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>
@@ -140,8 +141,8 @@ int main(int argc, char ** argv)
     // lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
     lv_obj_set_style_bg_img_src(screen, &bg, 0);
 
-    lv_font_t * font = lv_freetype_font_create("/root/deep_learning_security_system/src/assets/font/seguiemj.ttf", LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
-                                               16, LV_FREETYPE_FONT_STYLE_NORMAL);
+    lv_font_t * font = lv_freetype_font_create("/root/deep_learning_security_system/src/assets/font/font.ttf", LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                               18, LV_FREETYPE_FONT_STYLE_NORMAL);
 
     if(!font) {
         LV_LOG_ERROR("freetype font create failed.");
@@ -157,7 +158,7 @@ int main(int argc, char ** argv)
     /*Create a label with the new style*/
     lv_obj_t * label = lv_label_create(screen);
     lv_obj_add_style(label, &style, 0);
-    lv_label_set_text(label, "你好");
+    lv_label_set_text(label, "Hello world\nI'm a font created with FreeType");
     lv_obj_center(label);
 
     lv_linux_run_loop();
