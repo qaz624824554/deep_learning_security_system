@@ -132,8 +132,8 @@ int main(int argc, char ** argv)
 
     lv_linux_disp_init();
 
-    // lv_obj_t * screen = lv_screen_active();
-    // lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+    lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
     
 
     lv_linux_run_loop();
