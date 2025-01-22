@@ -783,13 +783,13 @@
 #define LV_BIN_DECODER_RAM_LOAD 1
 
 /*RLE解压缩库*/
-#define LV_USE_RLE 1
+#define LV_USE_RLE 0
 
 /*二维码库*/
-#define LV_USE_QRCODE 1
+#define LV_USE_QRCODE 0
 
 /*条形码库*/
-#define LV_USE_BARCODE 1
+#define LV_USE_BARCODE 0
 
 /*FreeType库*/
 #define LV_USE_FREETYPE 1
@@ -815,16 +815,16 @@
 
 /*启用矢量图形API
  *需要`LV_USE_MATRIX = 1`*/
-#define LV_USE_VECTOR_GRAPHIC  1
+#define LV_USE_VECTOR_GRAPHIC  0
 
 /*从src/libs文件夹启用ThorVG(矢量图形库)*/
-#define LV_USE_THORVG_INTERNAL 1 
+#define LV_USE_THORVG_INTERNAL 0
 
 /*假设已安装并链接到项目来启用ThorVG*/
 #define LV_USE_THORVG_EXTERNAL 0
 
 /*使用lvgl内置的LZ4库*/
-#define LV_USE_LZ4_INTERNAL  1
+#define LV_USE_LZ4_INTERNAL  0
 
 /*使用外部LZ4库*/
 #define LV_USE_LZ4_EXTERNAL  0
@@ -909,7 +909,7 @@
 #define LV_USE_IMGFONT 1
 
 /*1: 启用观察者模式实现*/
-#define LV_USE_OBSERVER 1
+#define LV_USE_OBSERVER 0
 
 /*1: 启用拼音输入法*/
 /*需要: lv_keyboard*/
