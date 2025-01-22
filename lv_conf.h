@@ -1058,29 +1058,29 @@
 *==================*/
 
 /*启用示例与库一起构建*/
-#define LV_BUILD_EXAMPLES 1
+#define LV_BUILD_EXAMPLES 0
 
 /*===================
  * 演示使用
  ====================*/
 
 /*显示一些组件。可能需要增加`LV_MEM_SIZE`*/
-#define LV_USE_DEMO_WIDGETS 1
+#define LV_USE_DEMO_WIDGETS 0
 
 /*演示编码器和键盘的使用*/
-#define LV_USE_DEMO_KEYPAD_AND_ENCODER 1
+#define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
 
 /*对系统进行基准测试*/
-#define LV_USE_DEMO_BENCHMARK 1
+#define LV_USE_DEMO_BENCHMARK 0
 
 /*为每个基本图形进行渲染测试。需要至少480x272显示器*/
-#define LV_USE_DEMO_RENDER 1
+#define LV_USE_DEMO_RENDER 0
 
 /*LVGL压力测试*/
-#define LV_USE_DEMO_STRESS 1
+#define LV_USE_DEMO_STRESS 0
 
 /*音乐播放器演示*/
-#define LV_USE_DEMO_MUSIC 1
+#define LV_USE_DEMO_MUSIC 0
 #if LV_USE_DEMO_MUSIC
     #define LV_DEMO_MUSIC_SQUARE    0
     #define LV_DEMO_MUSIC_LANDSCAPE 0
@@ -1090,16 +1090,16 @@
 #endif
 
 /*Flex布局演示*/
-#define LV_USE_DEMO_FLEX_LAYOUT     1
+#define LV_USE_DEMO_FLEX_LAYOUT     0
 
 /*智能手机类多语言演示*/
-#define LV_USE_DEMO_MULTILANG       1
+#define LV_USE_DEMO_MULTILANG       0
 
 /*组件变换演示*/
-#define LV_USE_DEMO_TRANSFORM       1
+#define LV_USE_DEMO_TRANSFORM       0
 
 /*演示滚动设置*/
-#define LV_USE_DEMO_SCROLL          1
+#define LV_USE_DEMO_SCROLL          0
 
 /*矢量图形演示*/
 #define LV_USE_DEMO_VECTOR_GRAPHIC  0

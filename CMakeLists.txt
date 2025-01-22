@@ -6,6 +6,8 @@ foreach(BACKEND_NAME "SDL" "LINUX_DRM" "LINUX_FBDEV" "X11" "WAYLAND")
     set("LV_USE_${BACKEND_NAME}" ${IS_BACKEND_ENABLED})
 endforeach()
 
+set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+
 # Uncomment if the program needs debugging
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb")
 
@@ -16,51 +18,24 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 add_subdirectory(lvgl)
 target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR})
 
-if (LV_USE_LINUX_DRM)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBDRM REQUIRED libdrm)
 
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(LIBDRM REQUIRED libdrm)
+find_package(OpenCV REQUIRED)
 
-    target_include_directories(lvgl PUBLIC ${LIBDRM_INCLUDE_DIRS})
-    add_executable(lvglsim main.c mouse_cursor_icon.c)
-    target_link_libraries(lvglsim lvgl lvgl::examples lvgl::demos lvgl::thorvg ${LIBDRM_LIBRARIES} m pthread)
+# 设置PKG查找路径
+# set(ENV{PKG_CONFIG_PATH} "/usr/lib/pkgconfig")
 
-elseif (LV_USE_SDL)
+pkg_check_modules(LIBAVCODEC REQUIRED libavcodec)
+pkg_check_modules(LIBAVFORMAT REQUIRED libavformat)
+pkg_check_modules(LIBAVFILTER REQUIRED libavfilter)
+pkg_check_modules(LIBAVUTIL REQUIRED libavutil)
+pkg_check_modules(LIBSWSCALE REQUIRED libswscale)
 
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(SDL2 REQUIRED sdl2)
-    pkg_check_modules(SDL2_image REQUIRED SDL2_image)
+file(GLOB_RECURSE SOURCE_FILES ${SOURCE_DIR}/*.cpp)
 
-    target_include_directories(lvgl PRIVATE ${SDL2_INCLUDE_DIRS})
-    target_include_directories(lvgl PRIVATE ${SDL2_IMAGE_INCLUDE_DIRS})
-    add_executable(lvglsim main.c mouse_cursor_icon.c)
-    target_link_libraries(lvglsim lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} m pthread)
-
-elseif (LV_USE_WAYLAND)
-
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(wayland-client REQUIRED wayland-client)
-    pkg_check_modules(wayland-cursor REQUIRED wayland-cursor)
-    pkg_check_modules(xkbcommon REQUIRED xkbcommon)
-
-    # Wayland protocols
-    pkg_check_modules(WAYLAND_PROTOCOLS REQUIRED wayland-protocols>=1.25)
-    pkg_get_variable(WAYLAND_PROTOCOLS_BASE wayland-protocols pkgdatadir)
-
-    execute_process(COMMAND "scripts/gen_wl_protocols.sh" OUTPUT_VARIABLE WAYLAND_PROTOCOLS_SRC)
-
-    target_include_directories(lvgl PRIVATE ${PROJECT_SOURCE_DIR}
-                                            "${PROJECT_SOURCE_DIR}/wl_protocols")
-    add_executable(lvglsim main.c ${WAYLAND_PROTOCOLS_SRC} 
-        mouse_cursor_icon.c backends/wayland.c)
-    target_compile_definitions(lvglsim PRIVATE LV_CONF_INCLUDE_SIMPLE)
-    target_link_libraries(lvglsim lvgl lvgl::examples lvgl::demos lvgl::thorvg m
-        wayland-client wayland-cursor xkbcommon)
-
-else()
-
-    add_executable(lvglsim main.c)
-    target_link_libraries(lvglsim lvgl lvgl::examples lvgl::demos lvgl::thorvg m pthread)
-endif()
+target_include_directories(lvgl PUBLIC ${LIBDRM_INCLUDE_DIRS})
+add_executable(lvglsim ${SOURCE_FILES})
+target_link_libraries(lvglsim lvgl lvgl::examples lvgl::demos lvgl::thorvg ${LIBDRM_LIBRARIES} m pthread ${OpenCV_LIBS} ${LIBAVCODEC_LIBRARIES} ${LIBAVFORMAT_LIBRARIES} ${LIBAVFILTER_LIBRARIES} ${LIBAVUTIL_LIBRARIES} ${LIBSWSCALE_LIBRARIES})
 
 add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim)

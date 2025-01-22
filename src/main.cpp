@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lvgl/demos/widgets/lv_demo_widgets.h"
 #include "lvgl/lvgl.h"
 #include "lvgl/src/display/lv_display.h"
 
@@ -135,7 +134,7 @@ int main(int argc, char ** argv)
 
     // lv_obj_t * screen = lv_screen_active();
     // lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
-    lv_demo_widgets();
+    
 
     lv_linux_run_loop();
 
