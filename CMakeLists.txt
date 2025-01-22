@@ -34,7 +34,7 @@ pkg_check_modules(LIBSWSCALE REQUIRED libswscale)
 
 file(GLOB_RECURSE SOURCE_FILES ${SOURCE_DIR}/*.cpp)
 
-target_include_directories(lvgl PUBLIC ${LIBDRM_INCLUDE_DIRS})
+target_include_directories(lvgl PUBLIC ${LIBDRM_INCLUDE_DIRS} ${SOURCE_DIR}/include ${SOURCE_DIR}/library)
 add_executable(lvglsim ${SOURCE_FILES})
 target_link_libraries(lvglsim lvgl lvgl::examples lvgl::demos lvgl::thorvg ${LIBDRM_LIBRARIES} m pthread ${OpenCV_LIBS} ${LIBAVCODEC_LIBRARIES} ${LIBAVFORMAT_LIBRARIES} ${LIBAVFILTER_LIBRARIES} ${LIBAVUTIL_LIBRARIES} ${LIBSWSCALE_LIBRARIES})
 

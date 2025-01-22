@@ -831,7 +831,7 @@
 
 /*FFmpeg库用于图像解码和播放视频
  *支持所有主要图像格式,因此不要与其他图像解码器一起启用*/
-#define LV_USE_FFMPEG 0
+#define LV_USE_FFMPEG 1
 #if LV_USE_FFMPEG
     /*将输入信息转储到stderr*/
     #define LV_FFMPEG_DUMP_FORMAT 0
@@ -931,7 +931,7 @@
 
 /*1: 启用文件浏览器*/
 /*需要: lv_table*/
-#define LV_USE_FILE_EXPLORER                     0
+#define LV_USE_FILE_EXPLORER                     1
 #if LV_USE_FILE_EXPLORER
     /*路径的最大长度*/
     #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)

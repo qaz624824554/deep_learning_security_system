@@ -7,6 +7,8 @@
 #include "lvgl/lvgl.h"
 #include "lvgl/src/display/lv_display.h"
 
+LV_IMAGE_DECLARE(bg);
+
 uint16_t window_width;
 uint16_t window_height;
 bool fullscreen;
@@ -133,8 +135,8 @@ int main(int argc, char ** argv)
     lv_linux_disp_init();
 
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
-    
+    // lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+    lv_obj_set_style_bg_img_src(screen, &bg, 0);
 
     lv_linux_run_loop();
 
