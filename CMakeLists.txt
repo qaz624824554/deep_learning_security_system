@@ -59,8 +59,7 @@ elseif (LV_USE_WAYLAND)
 
 else()
 
-    # No specific build steps required for FBDEV
-    add_executable(lvglsim main.c mouse_cursor_icon.c)
+    add_executable(lvglsim main.c)
     target_link_libraries(lvglsim lvgl lvgl::examples lvgl::demos lvgl::thorvg m pthread)
 endif()
 
