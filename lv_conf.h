@@ -704,7 +704,7 @@
 #define LV_USE_FS_STDIO 1
 #if LV_USE_FS_STDIO
     #define LV_FS_STDIO_LETTER 'A'
-    #define LV_FS_STDIO_PATH ""         /*设置工作目录。文件/目录路径将附加到其后*/
+    #define LV_FS_STDIO_PATH "/root"         /*设置工作目录。文件/目录路径将附加到其后*/
     #define LV_FS_STDIO_CACHE_SIZE 0    /*>0 在lv_fs_read()中缓存这么多字节*/
 #endif
 
@@ -792,14 +792,14 @@
 #define LV_USE_BARCODE 1
 
 /*FreeType库*/
-#define LV_USE_FREETYPE 0
+#define LV_USE_FREETYPE 1
 #if LV_USE_FREETYPE
     /*让FreeType使用LVGL内存和文件移植*/
-    #define LV_FREETYPE_USE_LVGL_PORT 0
+    #define LV_FREETYPE_USE_LVGL_PORT 1
 
     /*FreeType中字形的缓存数量。表示可以缓存的字形数量。
      *值越高,使用的内存就越多*/
-    #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
+    #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 512
 #endif
 
 /*内置TTF解码器*/
