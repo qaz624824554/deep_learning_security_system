@@ -140,7 +140,7 @@ int main(int argc, char ** argv)
     // lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
     lv_obj_set_style_bg_img_src(screen, &bg, 0);
 
-    lv_font_t * font = lv_freetype_font_create("A:/deep_learning_security_system/src/assets/font/seguiemj.ttf", LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+    lv_font_t * font = lv_freetype_font_create("/root/deep_learning_security_system/src/assets/font/seguiemj.ttf", LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                16, LV_FREETYPE_FONT_STYLE_NORMAL);
 
     if(!font) {
