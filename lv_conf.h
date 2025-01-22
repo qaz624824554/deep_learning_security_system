@@ -795,7 +795,7 @@
 #define LV_USE_FREETYPE 1
 #if LV_USE_FREETYPE
     /*让FreeType使用LVGL内存和文件移植*/
-    #define LV_FREETYPE_USE_LVGL_PORT 1
+    #define LV_FREETYPE_USE_LVGL_PORT 0
 
     /*FreeType中字形的缓存数量。表示可以缓存的字形数量。
      *值越高,使用的内存就越多*/
