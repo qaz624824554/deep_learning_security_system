@@ -7,7 +7,9 @@
 #include "lvgl/lvgl.h"
 #include "lvgl/src/display/lv_display.h"
 
-LV_IMAGE_DECLARE(bg);
+extern "C" {
+    LV_IMAGE_DECLARE(bg);
+}
 
 uint16_t window_width;
 uint16_t window_height;
