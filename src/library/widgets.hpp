@@ -2,6 +2,7 @@
 #define _WIDGETS_H
 
 #include <src/libs/ffmpeg/lv_ffmpeg.h>
+#include <src/libs/freetype/lv_freetype.h>
 #include <src/others/file_explorer/lv_file_explorer.h>
 #include <src/widgets/button/lv_button.h>
 #include <src/widgets/image/lv_image.h>
@@ -503,6 +504,17 @@ class Widget {
     };
 };
 
+class Font {
+  protected:
+    lv_font_t * font_;
+
+  public:
+    lv_font_t * get_font()
+    {
+        return font_;
+    };
+};
+
 class Object : public Widget {
   public:
     Object(lv_obj_t * parent)
@@ -715,6 +727,23 @@ class FFmpegPlayer : public Widget {
     {
         lv_ffmpeg_player_set_cmd(this->obj_, cmd);
         return *this;
+    };
+};
+
+class ScreenActive : public Widget {
+  public:
+    ScreenActive()
+    {
+        this->obj_ = lv_screen_active();
+    };
+};
+
+class FreetypeFont : public Font {
+  public:
+    FreetypeFont(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
+                 lv_freetype_font_style_t style)
+    {
+        this->font_ = lv_freetype_font_create(pathname, render_mode, size, style);
     };
 };
 
