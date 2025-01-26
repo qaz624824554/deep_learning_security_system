@@ -1,0 +1,208 @@
+LS(1)                                                                                                用户命令                                                                                               LS(1)
+
+名称
+       ls - 列出目录内容
+
+概要
+       ls [选项]... [文件]...
+
+描述
+       列出有关文件的信息(默认为当前目录)。如果没有指定 -cftuvSUX 或 --sort 选项，则按字母顺序排序条目。
+
+       长选项的必选参数对于短选项也是必选的。
+
+       -a, --all
+              不忽略以 . 开头的条目
+
+       -A, --almost-all
+              不列出隐含的 . 和 ..
+
+       --author
+              配合 -l 使用时，打印每个文件的作者
+
+       -b, --escape
+              以 C 语言风格打印不可打印字符
+
+       --block-size=大小
+              配合 -l 使用时，按指定大小缩放显示；例如，'--block-size=M'；具体格式见下文
+
+       -B, --ignore-backups
+              不列出以 ~ 结尾的隐含条目
+
+       -c     配合 -lt：按 ctime (文件状态信息的最后修改时间)排序并显示；配合 -l：显示 ctime 并按名称排序；否则：按 ctime 排序，最新的在前
+
+       -C     按列列出条目
+
+       --color[=WHEN]
+              为输出着色；WHEN 可以是'always'(默认)、'auto'或'never'；更多信息见下文
+
+       -d, --directory
+              列出目录本身，而不是其内容
+
+       -D, --dired
+              生成适用于 Emacs 的 dired 模式的输出
+
+       -f     不排序，启用 -aU，禁用 -ls --color
+
+       -F, --classify
+              在条目后附加指示符(*/=>@| 之一)
+
+       --file-type
+              类似，但不附加'*'
+
+       --format=WORD
+              across -x，commas -m，horizontal -x，long -l，single-column -1，verbose -l，vertical -C
+
+       --full-time
+              类似于 -l --time-style=full-iso
+
+       -g     类似 -l，但不列出所有者
+
+       --group-directories-first
+              目录在文件之前分组；
+              可以与 --sort 选项一起使用，但使用 --sort=none (-U) 会禁用分组
+
+       -G, --no-group
+              在长列表中，不打印组名
+
+       -h, --human-readable
+              配合 -l 和 -s，以易读方式打印大小，如 1K 234M 2G 等
+
+       --si   类似，但使用 1000 而不是 1024 为基数
+
+       -H, --dereference-command-line
+              跟随命令行中列出的符号链接
+
+       --dereference-command-line-symlink-to-dir
+              跟随指向目录的每个命令行符号链接
+
+       --hide=模式
+              不列出与 shell 模式匹配的隐含条目(可被 -a 或 -A 覆盖)
+
+       --hyperlink[=WHEN]
+              文件名超链接；WHEN 可以是'always'(默认)、'auto'或'never'
+
+       --indicator-style=WORD
+              用指定样式在条目名称后附加指示符：none(默认)、slash(-p)、file-type(--file-type)、classify(-F)
+
+       -i, --inode
+              打印每个文件的索引号
+
+       -I, --ignore=模式
+              不列出与 shell 模式匹配的隐含条目
+
+       -k, --kibibytes
+              默认使用 1024 字节块显示磁盘使用情况；仅用于 -s 和每个目录总计
+
+       -l     使用长列表格式
+
+       -L, --dereference
+              显示符号链接指向的文件信息，而不是链接本身的信息
+
+       -m     用逗号分隔的列表填充宽度
+
+       -n, --numeric-uid-gid
+              类似 -l，但列出数字用户和组 ID
+
+       -N, --literal
+              原样打印条目名称，不加引号
+
+       -o     类似 -l，但不列出组信息
+
+       -p, --indicator-style=slash
+              在目录后附加 / 指示符
+
+       -q, --hide-control-chars
+              用 ? 代替不可打印字符
+
+       --show-control-chars
+              原样显示不可打印字符(默认设置，除非程序是'ls'且输出到终端)
+
+       -Q, --quote-name
+              将条目名称用双引号括起
+
+       --quoting-style=WORD
+              使用指定引用样式：literal、locale、shell、shell-always、shell-escape、shell-escape-always、c、escape(覆盖 QUOTING_STYLE 环境变量)
+
+       -r, --reverse
+              逆序排序
+
+       -R, --recursive
+              递归列出子目录
+
+       -s, --size
+              以块为单位打印每个文件分配的大小
+
+       -S     按文件大小排序，最大的在前
+
+       --sort=WORD
+              按指定方式而不是名称排序：none(-U)、size(-S)、time(-t)、version(-v)、extension(-X)
+
+       --time=WORD
+              改变使用修改时间的默认值；访问时间(-u)：atime、access、use；
+              更改时间(-c)：ctime、status；创建时间：birth、creation；
+              配合 -l，WORD 决定显示哪个时间；配合 --sort=time，按 WORD 排序(最新的在前)
+
+       --time-style=时间样式
+              配合 -l 的时间/日期格式；见下文时间样式说明
+
+       -t     按时间排序，最新的在前；见 --time
+
+       -T, --tabsize=列数
+              假定制表符停在每个指定列数而不是 8
+
+       -u     配合 -lt：按访问时间排序并显示；配合 -l：显示访问时间并按名称排序；
+              否则：按访问时间排序，最新的在前
+
+       -U     不排序；按目录顺序列出条目
+
+       -v     文本中的(版本)数字自然排序
+
+       -w, --width=列数
+              设置输出宽度为指定列数。0 表示无限制
+
+       -x     按行而不是按列列出条目
+
+       -X     按条目扩展名字母顺序排序
+
+       -Z, --context
+              打印每个文件的安全上下文
+
+       -1     每行列出一个文件。避免与 -q 或 -b 一起使用时的换行符
+
+       --help 显示此帮助信息并退出
+
+       --version
+              输出版本信息并退出
+
+       大小参数是一个整数和可选单位(例如：10K 是 10*1024)。单位可以是 K、M、G、T、P、E、Z、Y(1024 的幂)或 KB、MB 等(1000 的幂)。也可以使用二进制前缀：KiB=K、MiB=M 等。
+
+       时间样式参数可以是 full-iso、long-iso、iso、locale 或 +格式。格式的解释方式与 date(1) 相同。如果格式是 格式1<换行>格式2，则格式1 适用于较旧的文件，格式2 适用于较新的文件。
+       以'posix-'为前缀的时间样式仅在 POSIX 区域设置之外生效。TIME_STYLE 环境变量也可以设置默认使用的样式。
+
+       使用颜色区分文件类型默认是禁用的，使用 --color=never 也会禁用。使用 --color=auto 时，仅当标准输出连接到终端时，ls 才会输出颜色代码。LS_COLORS 环境变量可以更改这些设置。
+       使用 dircolors 命令来设置它。
+
+   退出状态：
+       0      正常
+
+       1      小问题(例如，无法访问子目录)
+
+       2      严重问题(例如，无法访问命令行参数)
+
+作者
+       由 Richard M. Stallman 和 David MacKenzie 编写。
+
+报告错误
+       GNU coreutils 在线帮助：<https://www.gnu.org/software/coreutils/>
+       请向 <https://translationproject.org/team/> 报告任何翻译错误
+
+版权
+       版权所有 © 2020 自由软件基金会。许可证 GPLv3+：GNU GPL 第 3 版或更高版本 <https://gnu.org/licenses/gpl.html>。
+       这是自由软件：您可以自由更改和重新分发它。在法律允许的范围内没有任何保证。
+
+另见
+       完整文档 <https://www.gnu.org/software/coreutils/ls>
+       或本地可用：info '(coreutils) ls invocation'
+
+GNU coreutils 8.32                                                                                   2024年2月                                                                                               LS(1)

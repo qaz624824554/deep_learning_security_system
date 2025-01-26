@@ -42,18 +42,17 @@ target_include_directories(lvgl PUBLIC ${LIBDRM_INCLUDE_DIRS} ${SOURCE_DIR}/incl
 add_executable(lvglsim ${SOURCE_FILES} ${IMAGE_FILES})
 target_link_libraries(lvglsim
     lvgl
-    lvgl::examples
-    lvgl::demos 
-    lvgl::thorvg 
-    ${LIBDRM_LIBRARIES} 
-    m 
-    pthread 
-    ${OpenCV_LIBS} 
-    ${LIBAVCODEC_LIBRARIES} 
-    ${LIBAVFORMAT_LIBRARIES} 
-    ${LIBAVFILTER_LIBRARIES} 
-    ${LIBAVUTIL_LIBRARIES} 
-    ${LIBSWSCALE_LIBRARIES} 
+    ${LIBDRM_LIBRARIES}
+    m
+    pthread
+    rknnrt
+    gpiod
+    ${OpenCV_LIBS}
+    ${LIBAVCODEC_LIBRARIES}
+    ${LIBAVFORMAT_LIBRARIES}
+    ${LIBAVFILTER_LIBRARIES}
+    ${LIBAVUTIL_LIBRARIES}
+    ${LIBSWSCALE_LIBRARIES}
     ${LIBFREETYPE_LIBRARIES}
 )
 

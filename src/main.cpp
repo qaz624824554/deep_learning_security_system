@@ -1,3 +1,5 @@
+#include <exception>
+#include <iostream>
 #include <src/libs/freetype/lv_freetype.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -5,12 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "Camera.hpp"
+#include "Font.hpp"
+#include "RknnPool.hpp"
+#include "PageManager.hpp"
 #include "lvgl/lvgl.h"
 #include "lvgl/src/display/lv_display.h"
 
-extern "C" {
-LV_IMAGE_DECLARE(bg);
-}
+#include "UI.hpp"
 
 uint16_t window_width;
 uint16_t window_height;
@@ -137,29 +141,15 @@ int main(int argc, char ** argv)
 
     lv_linux_disp_init();
 
-    lv_obj_t * screen = lv_screen_active();
-    // lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
-    lv_obj_set_style_bg_img_src(screen, &bg, 0);
+    Camera camera;
+    FaceRknnPool face_rknn_pool;
+    ImageProcess retinaface_image_process{CAMERA_WIDTH, CAMERA_HEIGHT, face_rknn_pool.get_retinaface_model_size()};
 
-    lv_font_t * font = lv_freetype_font_create("/root/deep_learning_security_system/src/assets/font/font.ttf", LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
-                                               18, LV_FREETYPE_FONT_STYLE_NORMAL);
+    auto & page_manager = PageManager::getInstance();
 
-    if(!font) {
-        LV_LOG_ERROR("freetype font create failed.");
-        return 1;
-    }
+    page_manager.init(camera, face_rknn_pool, retinaface_image_process);
 
-    /*Create style with the new font*/
-    static lv_style_t style;
-    lv_style_init(&style);
-    lv_style_set_text_font(&style, font);
-    lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
-
-    /*Create a label with the new style*/
-    lv_obj_t * label = lv_label_create(screen);
-    lv_obj_add_style(label, &style, 0);
-    lv_label_set_text(label, "Hello world\nI'm a font created with FreeType");
-    lv_obj_center(label);
+    page_manager.switchToPage(PageManager::PageType::MAIN_PAGE);
 
     lv_linux_run_loop();
 
