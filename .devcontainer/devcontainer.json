@@ -1,0 +1,18 @@
+{
+    "name": "deep_learning_security_system",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+            "settings": {},
+            "extensions": [
+                "llvm-vs-code-extensions.vscode-clangd",
+                "josetr.cmake-language-support-vscode"
+            ]
+        }
+    },
+    "remoteUser": "root",
+    "updateRemoteUserUID": true
+}
