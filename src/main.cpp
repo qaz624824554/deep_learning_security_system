@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "Camera.hpp"
+#include "FFmpeg.hpp"
 #include "Font.hpp"
 #include "RknnPool.hpp"
 #include "PageManager.hpp"
@@ -142,12 +143,16 @@ int main(int argc, char ** argv)
     lv_linux_disp_init();
 
     Camera camera;
+    FFmpeg ffmpeg;
     FaceRknnPool face_rknn_pool;
+    SecurityRknnPool security_rknn_pool;
     ImageProcess retinaface_image_process{CAMERA_WIDTH, CAMERA_HEIGHT, face_rknn_pool.get_retinaface_model_size()};
+    ImageProcess yolo_image_process{CAMERA_WIDTH, CAMERA_HEIGHT, security_rknn_pool.get_yolo_model_size()};
 
     auto & page_manager = PageManager::getInstance();
 
     page_manager.init(camera, face_rknn_pool, retinaface_image_process);
+    page_manager.init(camera, security_rknn_pool, yolo_image_process, ffmpeg);
 
     page_manager.switchToPage(PageManager::PageType::MAIN_PAGE);
 

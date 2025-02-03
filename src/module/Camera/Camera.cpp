@@ -11,23 +11,27 @@ Camera::Camera() : is_running_(false)
     capture_.set(cv::CAP_PROP_FRAME_HEIGHT, CAMERA_HEIGHT);
 
     capture_thread_fn_ = [this]() {
-        while(is_running_) {
-            std::unique_lock<std::mutex> lock(frame_queue_mutex_);
-            frame_queue_cond_.wait(lock, [this]() { return frame_queue_.empty() && is_running_; });
+        try {
+            while(is_running_) {
+                std::unique_lock<std::mutex> lock(frame_queue_mutex_);
+                frame_queue_cond_.wait(lock, [this]() { return frame_queue_.empty() && is_running_; });
 
-            if(!is_running_) {
-                break;
+                if(!is_running_) {
+                    break;
+                }
+
+                std::unique_ptr<cv::Mat> frame = std::make_unique<cv::Mat>();
+                capture_ >> *frame;
+
+                if(frame->empty()) {
+                    break;
+                }
+
+                frame_queue_.push(std::move(frame));
+                frame_queue_cond_.notify_one();
             }
-
-            std::unique_ptr<cv::Mat> frame = std::make_unique<cv::Mat>();
-            capture_ >> *frame;
-
-            if(frame->empty()) {
-                break;
-            }
-
-            frame_queue_.push(std::move(frame));
-            frame_queue_cond_.notify_one();
+        } catch(std::exception & e) {
+            std::cerr << "Error: " << e.what() << std::endl;
         }
     };
 }

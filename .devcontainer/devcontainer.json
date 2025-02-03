@@ -8,8 +8,7 @@
         "vscode": {
             "settings": {},
             "extensions": [
-                "llvm-vs-code-extensions.vscode-clangd",
-                "josetr.cmake-language-support-vscode"
+                "llvm-vs-code-extensions.vscode-clangd"
             ]
         }
     },

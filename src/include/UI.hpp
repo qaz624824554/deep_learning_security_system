@@ -1,17 +1,21 @@
 #pragma once
 
 #include "Camera.hpp"
+#include "FFmpeg.hpp"
 #include "Lvgl.hpp"
 #include "RknnPool.hpp"
 #include "PageManager.hpp"
 
 #include <atomic>
+#include <cstdint>
 
-#define ACCESS_CONTROL_PAGE_DELAY_TIME 5000
+#define ACCESS_CONTROL_PAGE_DELAY_TIME 10000
+#define SECURITY_CAMERA_PAGE_AUTO_RECORD_DELAY_TIME 2
 
 class MainPage : public BasePage {
   private:
     LvObject * main_screen;
+
   public:
     MainPage();
     void show() override;
@@ -24,6 +28,7 @@ class AccessControlPage : public BasePage {
     LvImageDsc * image_dsc_ = new LvImageDsc;
     LvImage * image_;
     LvLabel * face_num_label_;
+
     Camera & camera_;
     FaceRknnPool & face_rknn_pool_;
     ImageProcess & image_process_;
@@ -42,6 +47,7 @@ class AccessControlPage : public BasePage {
             .count();
 
     std::function<void()> load_black_screen_fn;
+
   public:
     AccessControlPage(Camera & camera, FaceRknnPool & face_rknn_pool, ImageProcess & image_process);
 
@@ -56,8 +62,28 @@ class AccessControlPage : public BasePage {
 class SecurityCameraPage : public BasePage {
   private:
     LvObject * main_screen;
+    LvImageDsc * image_dsc_ = new LvImageDsc;
+    LvImage * image_;
+    LvTimer * timer;
+
+    Camera & camera_;
+    ImageProcess & image_process_;
+    SecurityRknnPool & security_rknn_pool_;
+    FFmpeg & ffmpeg_;
+
+    std::atomic_bool is_running     = false;
+    std::atomic_bool is_mp4_running = false;
+    std::atomic_bool is_auto_record = false;
+    std::atomic_bool is_auto_record_start = false;
+    uint64_t auto_record_start_time = 0;
+
+    std::mutex frame_mutex_;
+    std::condition_variable frame_cv_;
+    bool is_rtsp_turn_ = false; // true表示轮到RTSP线程取帧
+
   public:
-    SecurityCameraPage();
+    SecurityCameraPage(Camera & camera, ImageProcess & image_process, SecurityRknnPool & security_rknn_pool,
+                       FFmpeg & ffmpeg);
     void show() override;
     void hide() override;
 };

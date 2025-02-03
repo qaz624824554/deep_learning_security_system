@@ -1,7 +1,4 @@
-//
-// Created by kaylor on 3/6/24.
-//
-
+#include "Common.hpp"
 #include "Model.hpp"
 #include "Sensor.hpp"
 #include "RknnPool.hpp"
@@ -18,6 +15,8 @@ static float get_duclidean_distance(float * output1, float * output2)
     float norm = std::sqrt(sum);
     return norm;
 }
+
+// ============================ FaceRknnPool ============================
 
 // 构造函数，初始化线程池和模型
 FaceRknnPool::FaceRknnPool()
@@ -220,4 +219,110 @@ bool FaceRknnPool::face_recognition(int mode_id, cv::Mat & image, retinaface_res
 void FaceRknnPool::change_face_recognition_status(bool status)
 {
     this->is_face_recognition_ = status;
+}
+
+// ============================ SecurityRknnPool ============================
+
+SecurityRknnPool::SecurityRknnPool()
+{
+    this->thread_num_ = RKNN_POOL_SIZE;
+
+    init_yolo_post_process(YOLO11_LABEL_PATH);
+
+    try {
+        this->thread_pool_ = std::make_unique<ThreadPool>(this->thread_num_);
+
+        for(int i = 0; i < this->thread_num_; ++i) {
+            models_.push_back(std::make_shared<Yolo11>());
+        }
+
+    } catch(const std::bad_alloc & e) {
+        std::cout << "Out of memory: " << e.what() << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    for(int i = 0; i < this->thread_num_; ++i) {
+        auto ret = models_[i]->init(models_[0]->get_rknn_context(), i != 0);
+        if(ret != 0) {
+            std::cout << "Init rknn model failed!" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    this->yolo_model_size_ = this->models_[0]->get_model_width();
+}
+
+SecurityRknnPool::~SecurityRknnPool()
+{
+    deinit_yolo_post_process();
+}
+
+void SecurityRknnPool::add_inference_task(std::shared_ptr<cv::Mat> src, ImageProcess & image_process)
+{
+    thread_pool_->enqueue(
+        [&](std::shared_ptr<cv::Mat> original_img) {
+
+            this->is_person = false;
+
+            auto convert_img = image_process.convert(*original_img);
+
+            auto mode_id = get_model_id();
+
+            cv::Mat rgb_img = cv::Mat::zeros(this->models_[mode_id]->get_model_width(),
+                                             this->models_[mode_id]->get_model_height(), convert_img->type());
+            cv::cvtColor(*convert_img, rgb_img, cv::COLOR_BGR2RGB);
+
+            yolo_result_list results;
+            this->models_[mode_id]->inference(rgb_img.ptr(), &results, image_process.get_letter_box());
+
+            if(results.count > 0) {
+                for(int i = 0; i < results.count; ++i) {
+                    if(results.results[i].cls_id == 0) {
+                        this->is_person = true;
+                        break;
+                    }
+                }
+            }
+
+            cv::Scalar color{255, 0, 255};
+            image_process.image_post_process(*original_img, results, color);
+
+            std::lock_guard<std::mutex> lock_guard(this->image_results_mutex_);
+
+            this->image_results_.push(std::move(original_img));
+        },
+        std::move(src));
+}
+
+int SecurityRknnPool::get_model_id()
+{
+    std::lock_guard<std::mutex> lock(id_mutex_);
+    int mode_id = id_;
+    id_++;
+    if(id_ == thread_num_) {
+        id_ = 0;
+    }
+    return mode_id;
+}
+
+std::shared_ptr<cv::Mat> SecurityRknnPool::get_image_result_from_queue(bool is_pop)
+{
+    std::lock_guard<std::mutex> lock_guard(this->image_results_mutex_);
+
+    if(this->image_results_.empty()) {
+        return nullptr;
+    } else {
+        auto res = std::make_shared<cv::Mat>(*this->image_results_.front());
+
+        if(is_pop) {
+            this->image_results_.pop();
+        }
+
+        return std::move(res);
+    }
+}
+
+int SecurityRknnPool::get_yolo_model_size()
+{
+    return this->yolo_model_size_;
 }

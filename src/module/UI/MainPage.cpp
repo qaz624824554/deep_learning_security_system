@@ -47,7 +47,7 @@ MainPage::MainPage()
         .set_flex_align(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER)
         .add_event_cb(
             [&](lv_event_t * e, void * obj) {
-                // PageManager::getInstance().switchToPage(PageManager::PageType::ACCESS_CONTROL_PAGE);
+                PageManager::getInstance().switchToPage(PageManager::PageType::SECURITY_CAMERA_PAGE);
             },
             LV_EVENT_CLICKED, nullptr);
 

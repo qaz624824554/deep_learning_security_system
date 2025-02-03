@@ -1,7 +1,3 @@
-//
-// Created by kaylor on 3/4/24.
-//
-
 #pragma once
 
 #include "mutex"
@@ -14,7 +10,7 @@ public:
   std::unique_ptr<cv::Mat> convert(const cv::Mat &src);
   const letterbox_t &get_letter_box();
   void image_post_process(cv::Mat &image, retinaface_result &results, cv::Scalar &color);
-
+  void image_post_process(cv::Mat &image, yolo_result_list &results, cv::Scalar &color);
 private:
   double scale_;
   int padding_x_;

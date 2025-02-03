@@ -32,6 +32,11 @@ AccessControlPage::AccessControlPage(Camera & camera, FaceRknnPool & face_rknn_p
 
     image_->align(LV_ALIGN_CENTER, 0, -50);
 
+    LvButton back_button(main_screen->raw(), "返回");
+    back_button.set_pos(10, 10).add_event_cb(
+        [&](lv_event_t * e, void * data) { PageManager::getInstance().switchToPage(PageManager::PageType::MAIN_PAGE); },
+        LV_EVENT_CLICKED, nullptr);
+
     LvObject switch_container(main_screen->raw());
     switch_container.set_size(LV_SIZE_CONTENT, LV_SIZE_CONTENT)
         .align(LV_ALIGN_BOTTOM_MID, 200, 0)
@@ -41,14 +46,6 @@ AccessControlPage::AccessControlPage(Camera & camera, FaceRknnPool & face_rknn_p
         .set_flex_align(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     LvSwitch switch_button(switch_container.raw());
     switch_button.set_size(80, 40);
-    switch_button.add_state(LV_STATE_DISABLED);
-
-    LvButton back_button(main_screen->raw(), "返回");
-    back_button.set_pos(10, 10).add_event_cb(
-        [&](lv_event_t * e, void * data) { PageManager::getInstance().switchToPage(PageManager::PageType::MAIN_PAGE); },
-        LV_EVENT_CLICKED, nullptr);
-
-    switch_button.remove_state(LV_STATE_DISABLED);
 
     LvLabel label(switch_container.raw(), "人脸检测", lv_color_white());
     switch_button.add_event_cb(
@@ -104,6 +101,7 @@ AccessControlPage::AccessControlPage(Camera & camera, FaceRknnPool & face_rknn_p
             std::shared_ptr<cv::Mat> frame_res_ptr = face_rknn_pool_.get_image_result_from_queue();
 
             if(frame_res_ptr) {
+
                 cv::resize(*frame_res_ptr, *frame_res_ptr, cv::Size(800, 450));
 
                 memset(image_dsc_, 0, sizeof(LvImageDsc));
