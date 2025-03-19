@@ -4,6 +4,7 @@
 #include <src/draw/lv_image_dsc.h>
 #include <src/libs/ffmpeg/lv_ffmpeg.h>
 #include <src/libs/freetype/lv_freetype.h>
+#include <src/misc/lv_anim.h>
 #include <src/misc/lv_async.h>
 #include <src/misc/lv_event.h>
 #include <src/misc/lv_timer.h>
@@ -170,6 +171,11 @@ class LvWidget {
         lv_obj_remove_flag(obj_, flag);
         return *this;
     };
+
+    bool has_flag(lv_obj_flag_t flag)
+    {
+        return lv_obj_has_flag(obj_, flag);
+    }
 
     // state
     LvWidget & set_state(lv_state_t state, bool v)
@@ -891,4 +897,134 @@ class LvAsync {
             },
             &cb);
     }
+};
+
+class LvAnimation {
+  private:
+    lv_anim_t anim;
+    uint32_t repeat_cnt;
+    bool is_set_repeat_cnt = false;
+
+  public:
+    LvAnimation() {
+        lv_anim_init(&this->anim);
+    };
+    LvAnimation & set_var(lv_obj_t * obj)
+    {
+        lv_anim_set_var(&anim, obj);
+        return *this;
+    };
+    LvAnimation & set_exec_cb(lv_anim_exec_xcb_t exec_cb)
+    {
+        lv_anim_set_exec_cb(&anim, exec_cb);
+        return *this;
+    };
+    LvAnimation & set_duration(uint32_t duration)
+    {
+        lv_anim_set_duration(&anim, duration);
+        return *this;
+    };
+    LvAnimation & set_time(uint32_t duration)
+    {
+        lv_anim_set_time(&anim, duration);
+        return *this;
+    };
+    LvAnimation & set_delay(uint32_t delay)
+    {
+        lv_anim_set_delay(&anim, delay);
+        return *this;
+    };
+    LvAnimation & set_values(int32_t start, int32_t end)
+    {
+        lv_anim_set_values(&anim, start, end);
+        return *this;
+    };
+    LvAnimation & set_custom_exec_cb(lv_anim_custom_exec_cb_t exec_cb)
+    {
+        lv_anim_set_custom_exec_cb(&anim, exec_cb);
+        return *this;
+    };
+    LvAnimation & set_path_cb(lv_anim_path_cb_t path_cb)
+    {
+        lv_anim_set_path_cb(&anim, path_cb);
+        return *this;
+    };
+    LvAnimation & set_start_cb(lv_anim_start_cb_t start_cb)
+    {
+        lv_anim_set_start_cb(&anim, start_cb);
+        return *this;
+    };
+    LvAnimation & set_get_value_cb(lv_anim_get_value_cb_t get_value_cb)
+    {
+        lv_anim_set_get_value_cb(&anim, get_value_cb);
+        return *this;
+    };
+    LvAnimation & set_completed_cb(lv_anim_completed_cb_t completed_cb)
+    {
+        lv_anim_set_completed_cb(&anim, completed_cb);
+        return *this;
+    };
+    LvAnimation & set_deleted_cb(lv_anim_deleted_cb_t deleted_cb)
+    {
+        lv_anim_set_deleted_cb(&anim, deleted_cb);
+        return *this;
+    };
+    LvAnimation & set_playback_duration(uint32_t duration)
+    {
+        lv_anim_set_playback_duration(&anim, duration);
+        return *this;
+    };
+    LvAnimation & set_playback_time(uint32_t duration)
+    {
+        lv_anim_set_playback_time(&anim, duration);
+        return *this;
+    };
+    LvAnimation & set_playback_delay(uint32_t delay)
+    {
+        lv_anim_set_playback_delay(&anim, delay);
+        return *this;
+    };
+    LvAnimation & set_repeat_count(uint32_t cnt)
+    {
+        if(!this->is_set_repeat_cnt) {
+            this->is_set_repeat_cnt = true;
+            this->repeat_cnt        = cnt;
+        }
+        lv_anim_set_repeat_count(&this->anim, cnt);
+        return *this;
+    };
+    LvAnimation & set_repeat_delay(uint32_t delay)
+    {
+        lv_anim_set_repeat_delay(&anim, delay);
+        return *this;
+    };
+    LvAnimation & set_early_apply(bool en)
+    {
+        lv_anim_set_early_apply(&anim, en);
+        return *this;
+    };
+    LvAnimation & set_user_data(void * user_data)
+    {
+        lv_anim_set_user_data(&anim, user_data);
+        return *this;
+    };
+    LvAnimation & set_bezier3_param(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+    {
+        lv_anim_set_bezier3_param(&anim, x1, y1, x2, y2);
+        return *this;
+    };
+    LvAnimation & start()
+    {
+        if(this->is_set_repeat_cnt) {
+            lv_anim_set_repeat_count(&this->anim, this->repeat_cnt);
+        }
+        lv_anim_start(&this->anim);
+
+        return *this;
+    };
+    LvAnimation & stop()
+    {
+        lv_anim_set_repeat_count(&this->anim, 0);
+        return *this;
+    };
 };

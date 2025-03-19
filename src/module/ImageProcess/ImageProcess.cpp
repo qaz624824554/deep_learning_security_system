@@ -7,30 +7,6 @@
 // 人脸框长度
 #define FACE_BOX_LENGTH 60
 
-// 为不同的类别定义颜色，每个类别对应一个 RGB 色值
-static unsigned char class_colors[][3] = {
-    {255, 56, 56},   // 'FF3838'
-    {255, 157, 151}, // 'FF9D97'
-    {255, 112, 31},  // 'FF701F'
-    {255, 178, 29},  // 'FFB21D'
-    {207, 210, 49},  // 'CFD231'
-    {72, 249, 10},   // '48F90A'
-    {146, 204, 23},  // '92CC17'
-    {61, 219, 134},  // '3DDB86'
-    {26, 147, 52},   // '1A9334'
-    {0, 212, 187},   // '00D4BB'
-    {44, 153, 168},  // '2C99A8'
-    {0, 194, 255},   // '00C2FF'
-    {52, 69, 147},   // '344593'
-    {100, 115, 255}, // '6473FF'
-    {0, 24, 236},    // '0018EC'
-    {132, 56, 255},  // '8438FF'
-    {82, 0, 133},    // '520085'
-    {203, 56, 255},  // 'CB38FF'
-    {255, 149, 200}, // 'FF95C8'
-    {255, 55, 199}   // 'FF37C7'
-};
-
 // 计算缩放比例和填充大小的构造函数
 ImageProcess::ImageProcess(int width, int height, int target_size)
 {
@@ -123,18 +99,16 @@ void ImageProcess::image_post_process(cv::Mat & image, yolo_result_list & result
 
         std::string name = std::string(coco_cls_to_name(detect_result->cls_id));
 
-        if(name == "person") {
-            cv::rectangle(image, cv::Point(detect_result->box.left, detect_result->box.top),
-                          cv::Point(detect_result->box.right, detect_result->box.bottom), color, 5);
+        cv::rectangle(image, cv::Point(detect_result->box.left, detect_result->box.top),
+                      cv::Point(detect_result->box.right, detect_result->box.bottom), color, 5);
 
-            cv::rectangle(image, cv::Point(detect_result->box.left, detect_result->box.top - 100),
-                          cv::Point(detect_result->box.left + 380, detect_result->box.top), color, cv::FILLED);
+        cv::rectangle(image, cv::Point(detect_result->box.left, detect_result->box.top - 100),
+                      cv::Point(detect_result->box.left + 380, detect_result->box.top), color, cv::FILLED);
 
-            char text[256];
-            sprintf(text, "%s", name.c_str());
-            cv::putText(image, text, cv::Point(detect_result->box.left, detect_result->box.top - 30),
-                        cv::FONT_HERSHEY_COMPLEX, 3, cv::Scalar(0, 0, 0), 5,
-                        cv::LINE_8); // 绘制类别标签
-        }
+        char text[256];
+        sprintf(text, "%s", name.c_str());
+        cv::putText(image, text, cv::Point(detect_result->box.left, detect_result->box.top - 30),
+                    cv::FONT_HERSHEY_COMPLEX, 3, cv::Scalar(0, 0, 0), 5,
+                    cv::LINE_8); // 绘制类别标签
     }
 }

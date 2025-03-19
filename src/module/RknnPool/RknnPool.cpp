@@ -262,6 +262,13 @@ void SecurityRknnPool::add_inference_task(std::shared_ptr<cv::Mat> src, ImagePro
     thread_pool_->enqueue(
         [&](std::shared_ptr<cv::Mat> original_img) {
 
+            // 显示当前年月日时分秒
+            time_t now = time(nullptr);
+            strftime(this->time_str_, sizeof(this->time_str_), "%Y-%m-%d %H:%M:%S", localtime(&now));
+            std::string time_str_s(this->time_str_);
+            cv::putText(*original_img, time_str_s, cv::Point(original_img->cols - 1200, original_img->rows - 80),
+                        cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(255, 255, 255), 5, cv::LINE_8);
+
             this->is_person = false;
 
             auto convert_img = image_process.convert(*original_img);

@@ -13,12 +13,9 @@ Camera::Camera() : is_running_(false)
     capture_thread_fn_ = [this]() {
         try {
             while(is_running_) {
-                std::unique_lock<std::mutex> lock(frame_queue_mutex_);
-                frame_queue_cond_.wait(lock, [this]() { return frame_queue_.empty() && is_running_; });
 
-                if(!is_running_) {
-                    break;
-                }
+                std::unique_lock<std::mutex> lock(frame_queue_mutex_);
+                frame_queue_cond_.wait(lock, [this]() { return frame_queue_.empty(); });
 
                 std::unique_ptr<cv::Mat> frame = std::make_unique<cv::Mat>();
                 capture_ >> *frame;

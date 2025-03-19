@@ -8,7 +8,7 @@
 
 #define RETINA_FACE_MODEL_PATH "src/assets/model/retina_face.rknn"
 #define FACENET_MODEL_PATH "src/assets/model/facenet.rknn"
-#define YOLO11_MODEL_PATH "src/assets/model/yolo11n.rknn"
+#define YOLO11_MODEL_PATH "src/assets/model/yolo11s.rknn"
 #define YOLO11_LABEL_PATH "src/assets/model/coco_80_labels_list.txt"
 
 #define NPU_CORE_NUM 3

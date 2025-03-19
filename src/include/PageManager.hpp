@@ -18,7 +18,7 @@ class PageManager {
     enum class PageType {
         ACCESS_CONTROL_PAGE,
         MAIN_PAGE,
-        SECURITY_CAMERA_PAGE,
+        SECURITY_CAMERA_PAGE
     };
 
     static PageManager & getInstance()

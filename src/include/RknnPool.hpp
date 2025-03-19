@@ -58,6 +58,7 @@ class SecurityRknnPool {
     uint32_t id_{0};
     int yolo_model_size_;
 
+    char time_str_[20];
 
   public:
     SecurityRknnPool();

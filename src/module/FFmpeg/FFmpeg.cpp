@@ -22,7 +22,7 @@ FFmpeg::~FFmpeg()
 
 std::string FFmpeg::get_mp4_path()
 {
-    return "/root/record/record_" + std::to_string(time(nullptr)) + ".mp4";
+    return MP4_DIR_PATH "record_" + std::to_string(time(nullptr)) + ".mp4";
 }
 
 void FFmpeg::init_encodec()
@@ -32,7 +32,7 @@ void FFmpeg::init_encodec()
 
     AVDictionary * rk_encodec_opts = nullptr;
 
-    av_dict_set_int(&rk_encodec_opts, "qp_init", 25, 0);
+    // av_dict_set_int(&rk_encodec_opts, "qp_init", 25, 0);
     // av_dict_set(&rk_encodec_opts, "rc_mode", "VBR", 0);
     av_dict_set(&rk_encodec_opts, "profile", "high", 0);
     av_dict_set(&rk_encodec_opts, "level", "5.2", 0);
@@ -41,9 +41,8 @@ void FFmpeg::init_encodec()
     rk_encodec_ctx_->height    = 2160;
     rk_encodec_ctx_->pix_fmt   = AV_PIX_FMT_BGR24;
     rk_encodec_ctx_->time_base = (AVRational){1, 30};
-    rk_encodec_ctx_->gop_size  = 30;
-    rk_encodec_ctx_->max_b_frames = 1;
-    // rk_encodec_ctx_->bit_rate  = 1024 * 2;
+    rk_encodec_ctx_->gop_size  = 25;
+    rk_encodec_ctx_->bit_rate  = 1024 * 1024 * 5;
 
     if(avcodec_open2(rk_encodec_ctx_, rk_encodec_, &rk_encodec_opts) < 0) {
         throw std::runtime_error("avcodec_open2 failed");
@@ -262,6 +261,8 @@ void FFmpeg::start_record(std::string path)
 
 void FFmpeg::stop_record()
 {
+    std::cout << "stop_record" << std::endl;
+
     if(mp4_out_fmt_ctx_ && av_write_trailer(mp4_out_fmt_ctx_) < 0) {
         throw std::runtime_error("av_write_trailer failed");
     }

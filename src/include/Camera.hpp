@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opencv2/opencv.hpp"
+#include <atomic>
 #include <condition_variable>
 #include <memory>
 #include <thread>
@@ -17,7 +18,7 @@ class Camera {
     std::mutex frame_queue_mutex_;
     std::condition_variable frame_queue_cond_;
 
-    bool is_running_;
+    std::atomic_bool is_running_;
     std::thread capture_thread_;
     std::function<void()> capture_thread_fn_;
 

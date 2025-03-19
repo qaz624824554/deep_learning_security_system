@@ -19,6 +19,10 @@ extern "C" {
 LV_IMAGE_DECLARE(bg);
 }
 
+static LvImageDsc * image_dsc_ = new LvImageDsc;
+static LvImage * image_;
+static LvLabel * face_num_label_;
+
 AccessControlPage::AccessControlPage(Camera & camera, FaceRknnPool & face_rknn_pool, ImageProcess & image_process)
     : camera_(camera), face_rknn_pool_(face_rknn_pool), image_process_(image_process)
 {
@@ -98,6 +102,7 @@ AccessControlPage::AccessControlPage(Camera & camera, FaceRknnPool & face_rknn_p
 
     timer = new LvTimer(
         [&](lv_timer_t * t, void * data) {
+
             std::shared_ptr<cv::Mat> frame_res_ptr = face_rknn_pool_.get_image_result_from_queue();
 
             if(frame_res_ptr) {
@@ -115,6 +120,7 @@ AccessControlPage::AccessControlPage(Camera & camera, FaceRknnPool & face_rknn_p
 
                 image_->set_src(image_dsc_->raw());
             }
+
         },
         10, nullptr);
 
@@ -160,6 +166,7 @@ void AccessControlPage::show()
 
 void AccessControlPage::hide()
 {
+    image_->add_flag(LV_OBJ_FLAG_HIDDEN);
     timer->pause();
     is_running = false;
     SR501::stop_listen_state();
@@ -172,6 +179,8 @@ void AccessControlPage::show_normal_screen()
     is_running = true;
 
     timer->resume();
+
+    image_->remove_flag(LV_OBJ_FLAG_HIDDEN);
 
     std::thread([&]() {
         try {

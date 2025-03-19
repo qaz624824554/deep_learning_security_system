@@ -1,11 +1,31 @@
 #include "Font.hpp"
 #include "Lvgl.hpp"
 #include "UI.hpp"
+#include "Util.hpp"
+#include <iostream>
 #include <mutex>
+#include <src/core/lv_obj.h>
+#include <src/layouts/flex/lv_flex.h>
+#include <src/misc/lv_area.h>
+#include <src/misc/lv_color.h>
+#include <src/misc/lv_palette.h>
 #include <thread>
 
 extern "C" {
 LV_IMAGE_DECLARE(bg);
+}
+
+static LvObject * main_screen;
+static LvImageDsc * image_dsc_ = new LvImageDsc;
+static LvLabel * alarm_label;
+static LvImage * image_;
+static LvTimer * timer;
+static LvObject * record_icon;
+static LvAnimation * record_icon_anim;
+
+static void anim_opacity_cb_(void * var, int32_t value)
+{
+    lv_obj_set_style_bg_opa((lv_obj_t *)var, value, 0);
 }
 
 SecurityCameraPage::SecurityCameraPage(Camera & camera, ImageProcess & image_process,
@@ -17,6 +37,39 @@ SecurityCameraPage::SecurityCameraPage(Camera & camera, ImageProcess & image_pro
 
     image_ = new LvImage(main_screen->raw());
     image_->align(LV_ALIGN_CENTER, 0, -50);
+
+    alarm_label = new LvLabel(main_screen->raw(), "检测到人体！", lv_palette_main(LV_PALETTE_RED));
+    alarm_label->align(LV_ALIGN_CENTER, 0, 100).set_style_text_font(Font24::get_font(), 0).add_flag(LV_OBJ_FLAG_HIDDEN);
+
+    record_icon = new LvObject(image_->raw());
+
+    record_icon->add_flag(LV_OBJ_FLAG_HIDDEN)
+        .align(LV_ALIGN_TOP_RIGHT, -10, 10)
+        .set_size(100, 40)
+        .set_flex_flow(LV_FLEX_FLOW_ROW)
+        .set_flex_align(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER)
+        .set_style_border_color(lv_color_hex(0xff0000), 0)
+        .set_style_bg_opa(LV_OPA_30, 0)
+        .remove_flag(LV_OBJ_FLAG_SCROLLABLE);
+
+    LvObject record_icon_dot(record_icon->raw());
+
+    record_icon_dot.set_size(20, 20)
+        .set_style_radius(20, 0)
+        .set_style_border_width(0, 0)
+        .set_style_bg_color(lv_color_hex(0xff0000), 0)
+        .remove_flag(LV_OBJ_FLAG_SCROLLABLE);
+
+    LvLabel record_icon_label(record_icon->raw(), "REC", lv_color_black());
+
+    record_icon_anim = new LvAnimation();
+    record_icon_anim->set_var(record_icon_dot.raw())
+        .set_exec_cb(anim_opacity_cb_)
+        .set_duration(1000)
+        .set_delay(0)
+        .set_values(0, 255)
+        .set_path_cb(lv_anim_path_ease_in_out)
+        .set_repeat_count(LV_ANIM_REPEAT_INFINITE);
 
     LvButton back_button(main_screen->raw(), "返回");
     back_button.set_pos(10, 10).add_event_cb(
@@ -35,9 +88,9 @@ SecurityCameraPage::SecurityCameraPage(Camera & camera, ImageProcess & image_pro
         [&](lv_event_t * e, void * data) {
             auto target = (lv_obj_t *)lv_event_get_target(e);
             if(lv_obj_has_state(target, LV_STATE_CHECKED)) {
-                ffmpeg_.start_record();
+                this->inner_start_record();
             } else {
-                ffmpeg_.stop_record();
+                this->inner_stop_record();
             }
         },
         LV_EVENT_VALUE_CHANGED, nullptr);
@@ -55,9 +108,9 @@ SecurityCameraPage::SecurityCameraPage(Camera & camera, ImageProcess & image_pro
         [&](lv_event_t * e, void * data) {
             auto target = (lv_obj_t *)lv_event_get_target(e);
             if(lv_obj_has_state(target, LV_STATE_CHECKED)) {
-                is_auto_record = true;
+                is_auto_record_ = true;
             } else {
-                is_auto_record = false;
+                is_auto_record_ = false;
             }
         },
         LV_EVENT_VALUE_CHANGED, nullptr);
@@ -75,20 +128,20 @@ SecurityCameraPage::SecurityCameraPage(Camera & camera, ImageProcess & image_pro
         [&](lv_event_t * e, void * data) {
             auto target = (lv_obj_t *)lv_event_get_target(e);
             if(lv_obj_has_state(target, LV_STATE_CHECKED)) {
-
+                is_alarm_ = true;
             } else {
+                is_alarm_ = false;
             }
         },
         LV_EVENT_VALUE_CHANGED, nullptr);
     LvLabel alarm_label(alarm_container.raw(), "检测到有人时报警", lv_color_white());
 
-    // TODO: 定时器换成lv_async_call
     timer = new LvTimer(
         [&](lv_timer_t * t, void * data) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
-            frame_cv_.wait(lock, [this]() { return !is_rtsp_turn_ || !is_running; });
+            frame_cv_.wait(lock, [this]() { return !is_rtsp_turn_ || !is_running_; });
 
-            if(!is_running) {
+            if(!is_running_) {
                 return;
             }
 
@@ -121,7 +174,7 @@ void SecurityCameraPage::show()
 {
     lv_screen_load(main_screen->raw());
 
-    is_running = true;
+    is_running_ = true;
 
     timer->resume();
 
@@ -130,7 +183,7 @@ void SecurityCameraPage::show()
     std::thread([this]() {
         try {
             camera_.start();
-            while(is_running) {
+            while(is_running_) {
                 auto frame = camera_.get_frame();
                 security_rknn_pool_.add_inference_task(std::move(frame), image_process_);
                 {
@@ -148,33 +201,43 @@ void SecurityCameraPage::show()
                         // 如果自动录像开启，并且检测到人，并且is_auto_record_start为false，记录is_auto_record_start_time，开始录像
                         // 如果自动录像开启，并且检测到人，并且is_auto_record_start为true，记录is_auto_record_start_time，继续录像
                         // 如果自动录像开启，没有检测到人，并且is_auto_record_start为true，且is_auto_record_start_time超过当前时间3秒，则停止录像
-                        if(is_auto_record) {
+                        if(is_auto_record_) {
                             if(security_rknn_pool_.is_person) {
-                                if(!is_auto_record_start) {
-                                    is_auto_record_start = true;
-                                    auto_record_start_time = std::time(nullptr);
-                                    ffmpeg_.start_record();
-
+                                if(!is_auto_record_start_) {
+                                    is_auto_record_start_   = true;
+                                    auto_record_start_time_ = std::time(nullptr);
+                                    this->inner_start_record();
                                     std::cout << "开始录像" << std::endl;
                                 } else {
-                                    auto_record_start_time = std::time(nullptr);
-                                    std::cout << "继续录像" << std::endl;
+                                    auto_record_start_time_ = std::time(nullptr);
                                 }
                             } else {
-                                if(is_auto_record_start && std::time(nullptr) - auto_record_start_time > SECURITY_CAMERA_PAGE_AUTO_RECORD_DELAY_TIME) {
-                                    is_auto_record_start = false;
-                                    ffmpeg_.stop_record();
+                                if(is_auto_record_start_ && std::time(nullptr) - auto_record_start_time_ >
+                                                                SECURITY_CAMERA_PAGE_AUTO_RECORD_DELAY_TIME) {
+                                    is_auto_record_start_ = false;
+                                    this->inner_stop_record();
 
                                     std::cout << "停止录像1" << std::endl;
                                 }
                             }
                         } else {
-                            if (is_auto_record_start) {
-                                is_auto_record_start = false;
-                                ffmpeg_.stop_record();
+                            if(is_auto_record_start_) {
+                                is_auto_record_start_ = false;
+                                this->inner_stop_record();
 
                                 std::cout << "停止录像2" << std::endl;
                             }
+                        }
+
+                        if(is_alarm_ && security_rknn_pool_.is_person && !is_alarm_start_) {
+                            is_alarm_start_ = true;
+                            std::thread([this]() {
+                                lv_async_call([](void *) { alarm_label->remove_flag(LV_OBJ_FLAG_HIDDEN); }, nullptr);
+                                execute_command("aplay -D bluealsa:DEV=D0:6A:81:16:56:27,PROFILE=a2dp /root/alert.wav");
+                                std::this_thread::sleep_for(std::chrono::seconds(2));
+                                is_alarm_start_ = false;
+                                lv_async_call([](void *) { alarm_label->add_flag(LV_OBJ_FLAG_HIDDEN); }, nullptr);
+                            }).detach();
                         }
                     }
                 }
@@ -190,7 +253,31 @@ void SecurityCameraPage::hide()
 {
     ffmpeg_.stop_process_frame();
 
-    is_running = false;
+    is_running_ = false;
 
     timer->pause();
+}
+
+void SecurityCameraPage::inner_start_record()
+{
+    ffmpeg_.start_record();
+
+    lv_async_call(
+        [](void *) {
+            record_icon->remove_flag(LV_OBJ_FLAG_HIDDEN);
+            record_icon_anim->start();
+        },
+        nullptr);
+}
+
+void SecurityCameraPage::inner_stop_record()
+{
+    ffmpeg_.stop_record();
+
+    lv_async_call(
+        [](void *) {
+            record_icon->add_flag(LV_OBJ_FLAG_HIDDEN);
+            record_icon_anim->stop();
+        },
+        nullptr);
 }
