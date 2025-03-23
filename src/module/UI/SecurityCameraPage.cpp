@@ -233,7 +233,7 @@ void SecurityCameraPage::show()
                             is_alarm_start_ = true;
                             std::thread([this]() {
                                 lv_async_call([](void *) { alarm_label->remove_flag(LV_OBJ_FLAG_HIDDEN); }, nullptr);
-                                execute_command("aplay -D bluealsa:DEV=D0:6A:81:16:56:27,PROFILE=a2dp /root/alert.wav");
+                                // execute_command("aplay -D bluealsa:DEV=D0:6A:81:16:56:27,PROFILE=a2dp /root/alert.wav");
                                 std::this_thread::sleep_for(std::chrono::seconds(2));
                                 is_alarm_start_ = false;
                                 lv_async_call([](void *) { alarm_label->add_flag(LV_OBJ_FLAG_HIDDEN); }, nullptr);
