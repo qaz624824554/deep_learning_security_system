@@ -1,146 +1,61 @@
-# LVGL on top of Linux graphics stack
+# 基于深度学习的人脸门禁+ IPC 智能安防监控系统
 
-Example project to use LVGL on top of Linux graphics stack.
-Currently supported backends are legacy framebuffer
-(fbdev), modern DRM/KMS, Wayland or SDL2.
+本项目基于 yolo11、retinaface、facenet 深度学习模型，GUI 为 LVGL，实现人脸检测、人脸识别、物体检测的 IPC 智能安防监控系统，满帧运行。
 
-By default, legacy framebuffer backend uses `/dev/fb0` device node,
-DRM/KMS backend uses '/dev/dri/card0' card node, SDL2 uses window
-resolution of 800x480.
+英文版请见 [README_en.md](README_en.md)
 
-Check out this blog post for a step by step tutorial:
-https://blog.lvgl.io/2018-01-03/linux_fb
+## 克隆项目
 
-## Build dependencies
-Check the [Dockerfiles](docker/) for the build dependencies.  
-
-## Clone the project
-
-Clone the LVGL Framebuffer Demo project and its related sub modules.
-
+```sh
+git clone https://github.com/qaz624824554/deep_learning_security_system.git
+cd deep_learning_security_system
 ```
-git clone https://github.com/lvgl/lv_port_linux.git
-cd lv_port_linux/
+
+LVGL 是本项目的一个子模块，使用以下命令获取它，将会下载到 lvgl/ 目录
+
+```sh
 git submodule update --init --recursive
 ```
 
-## Select graphics backend
+## 前置条件
 
-To use legacy framebuffer (fbdev) support, adjust `lv_conf.h` as follows:
-```
-#define LV_USE_LINUX_FBDEV	1
-#define LV_USE_LINUX_DRM	0
-#define LV_USE_SDL		0
-#define LV_USE_WAYLAND		0
-```
+### 依赖库
 
-To use modern DRM/KMS support, adjust `lv_conf.h` as follows:
-```
-#define LV_USE_LINUX_FBDEV	0
-#define LV_USE_LINUX_DRM	1
-#define LV_USE_SDL		0
-#define LV_USE_WAYLAND		0
-```
+本项目依赖多个第三方库，请确保你的开发板已经安装以下库：
 
-To use SDL2 support, adjust `lv_conf.h` as follows:
-```
-#define LV_USE_LINUX_FBDEV	0
-#define LV_USE_LINUX_DRM	0
-#define LV_USE_SDL		1
-#define LV_USE_WAYLAND		0
-```
+- [Opencv4.9](https://github.com/opencv/opencv/tree/4.9.0)
+- [RKNN](https://github.com/airockchip/rknn-toolkit2)
+- [FFmpeg-rockchip](https://github.com/nyanmisaka/ffmpeg-rockchip)
+- [MPP](https://github.com/rockchip-linux/mpp)
+- [BlueAlsa](https://github.com/arkq/bluez-alsa)
 
+### 硬件
 
-To use wayland, adjust `lv_conf.h` as follows:
-```
-#define LV_USE_LINUX_FBDEV	0
-#define LV_USE_LINUX_DRM	0
-#define LV_USE_SDL		0
-#define LV_USE_WAYLAND		1
+<img src="./assets/hardware.jpeg" alt="硬件" width="50%">
+
+- 野火鲁班猫4 RK3588S2
+- IMX415 800W 4k 摄像头
+- RTL8822CE Wifi+BT
+- mipi LCD RGB 7寸 1024×600 触摸屏
+- 人体红外检测 SR501：通过 GPIO 读取相应数值，用于判断是否有人靠近
+- 128×32 OLED屏：通过 I2C 通信显示画面内容，用于显示人脸检测结果
+- 蓝牙音箱
+
+## 开始使用
+
+编译
+
+```sh
+cmake -B build .
+cmake --build build -j8
 ```
 
+运行 `/bin` 目录下的 `lvglsim` 文件即可。
 
-### cmake
+## 线程图
 
-```
-cmake -B build -S .
-make -C build -j
-```
+<img src="./assets/process.png" alt="处理流程图" width="50%">
 
-### Makefile
+## 演示视频
 
-```
-make -j
-```
-
-## Command line options
-
-Command line options are used to modify behavior of the demo, they take precedence over environment variables.
-
-### Wayland
-
-- `-f` - enters fullscreen on startup
-- `-m` - maximizes window on startup
-- `-w <window width>` - set the width of the window
-- `-h <window height>` - set the height of the window
-
-### SDL2
-
-- `-w <window width>` - set the width of the window
-- `-h <window height>` - set the height of the window
-
-## Environment variables
-
-Environment variables can be set to modify the behavior of the demo.
-
-### Legacy framebuffer (fbdev)
-
-- `LV_LINUX_FBDEV_DEVICE` - override default (`/dev/fb0`) framebuffer device node.
-
-
-### EVDEV touchscreen/mouse pointer device
-
-- `LV_LINUX_EVDEV_POINTER_DEVICE` - override default (`/dev/input/by-id/my-mouse-or-touchscreen`) input device
-
-### DRM/KMS
-
-- `LV_LINUX_DRM_CARD` - override default (`/dev/dri/card0`) card.
-
-### SDL2
-
-- `LV_SIM_WINDOW_WIDTH` - width of SDL2 surface (default `800`).
-- `LV_SIM_WINDOW_HEIGHT` - height of SDL2 surface (default `480`).
-
-### Wayland
-
-- `LV_SIM_WINDOW_WIDTH` - width of the window (default `800`).
-- `LV_SIM_WINDOW_HEIGHT` - height of the window (default `480`).
-
-
-## Run the demo application
-
-### FBDEV
-
-Unpriviledged users don't have access to the framebuffer device `/dev/fb0`
-`sudo` or `su` must be used.
-
-cmake:
-```
-sudo ./bin/lvglsim
-```
-
-Makefile:
-```
-cd build/bin/
-sudo main
-```
-
-Access to the framebuffer device can be granted by adding the unpriviledged user to the `video` group
-
-cmake:
-```
-sudo adduser $USER video
-newgrp video
-./bin/lvglsim
-```
-
+<video src="./assets/demonstration.mp4" controls width="50%"></video>
