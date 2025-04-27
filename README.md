@@ -58,4 +58,3 @@ cmake --build build -j8
 
 ## 演示视频
 
-<video src="./assets/demonstration.mp4" controls width="50%"></video>

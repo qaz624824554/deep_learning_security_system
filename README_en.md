@@ -56,4 +56,3 @@ Run the `lvglsim` file in the `/bin` directory.
 
 ## Demonstration Video
 
-<video src="./assets/demonstration.mp4" controls width="50%"></video>
